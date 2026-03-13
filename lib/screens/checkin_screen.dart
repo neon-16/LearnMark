@@ -5,6 +5,7 @@ import '../models/attendance_model.dart';
 import '../services/location_service.dart';
 import '../services/database_service.dart';
 import '../services/qr_service.dart';
+import '../widgets/qr_scanner_page.dart';
 
 class CheckInScreen extends StatefulWidget {
   const CheckInScreen({Key? key}) : super(key: key);
@@ -28,6 +29,24 @@ class _CheckInScreenState extends State<CheckInScreen> {
   bool _isLoading = false;
   String _statusMessage = '';
   bool _locationObtained = false;
+
+  Future<void> _scanQRCode() async {
+    final scannedValue = await Navigator.push<String>(
+      context,
+      MaterialPageRoute(
+        builder: (_) => const QRScannerPage(title: 'Scan Class QR'),
+      ),
+    );
+
+    if (!mounted) return;
+
+    if (scannedValue != null && scannedValue.isNotEmpty) {
+      setState(() {
+        _classIdController.text = scannedValue;
+        _statusMessage = 'QR code captured';
+      });
+    }
+  }
 
   @override
   void dispose() {
@@ -226,6 +245,24 @@ class _CheckInScreenState extends State<CheckInScreen> {
                   ),
             ),
             const SizedBox(height: 8),
+            Row(
+              children: [
+                ElevatedButton.icon(
+                  onPressed: _isLoading ? null : _scanQRCode,
+                  icon: const Icon(Icons.camera_alt_outlined),
+                  label: const Text('Open Scanner'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue.shade600,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Text(
+                  'or enter manually',
+                  style: TextStyle(color: Colors.grey.shade600),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
             TextField(
               controller: _classIdController,
               decoration: InputDecoration(
