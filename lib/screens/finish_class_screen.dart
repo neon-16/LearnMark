@@ -53,6 +53,7 @@ class _FinishClassScreenState extends State<FinishClassScreen> {
       _pendingCheckIns = pending;
       if (pending.isNotEmpty) {
         _selectedCheckinId = pending.first.checkinId;
+        _classIdController.text = 'CLASS:${pending.first.classId}';
       }
     });
   }
@@ -127,6 +128,42 @@ class _FinishClassScreenState extends State<FinishClassScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Invalid QR code format. Expected: CLASS:ID'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    final selectedCheckIn = _pendingCheckIns.firstWhere(
+      (c) => c.checkinId == _selectedCheckinId,
+      orElse: () => CheckInRecord(
+        checkinId: '',
+        studentId: '',
+        classId: '',
+        checkinTime: DateTime.now(),
+        gpsLatitude: 0,
+        gpsLongitude: 0,
+        previousTopic: '',
+        expectedTopic: '',
+        preMood: 0,
+      ),
+    );
+
+    if (selectedCheckIn.checkinId.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('No pending check-in selected'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    final scannedClassId = _qrService.extractClassId(_classIdController.text);
+    if (scannedClassId == null || scannedClassId != selectedCheckIn.classId) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Scanned class does not match the selected check-in'),
           backgroundColor: Colors.red,
         ),
       );

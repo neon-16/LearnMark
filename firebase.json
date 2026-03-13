@@ -11,7 +11,8 @@
     "redirects": [
       {
         "source": "/index.html",
-        "destination": "/index.html"
+        "destination": "/index.html",
+        "type": 302
       }
     ],
     "rewrites": [

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../models/attendance_model.dart';
 import '../services/location_service.dart';
 import '../services/database_service.dart';
@@ -25,10 +26,17 @@ class _CheckInScreenState extends State<CheckInScreen> {
   final TextEditingController _classIdController = TextEditingController();
 
   int _selectedMood = 3; // Default neutral
+  String _studentId = '';
   Position? _currentPosition;
   bool _isLoading = false;
   String _statusMessage = '';
   bool _locationObtained = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _ensureStudentId();
+  }
 
   Future<void> _scanQRCode() async {
     final scannedValue = await Navigator.push<String>(
@@ -46,6 +54,19 @@ class _CheckInScreenState extends State<CheckInScreen> {
         _statusMessage = 'QR code captured';
       });
     }
+  }
+
+  Future<void> _ensureStudentId() async {
+    // Create or reuse a device-local student id so histories do not collide across installs.
+    final prefs = await SharedPreferences.getInstance();
+    final existing = prefs.getString('studentId');
+    if (existing != null && existing.isNotEmpty) {
+      _studentId = existing;
+      return;
+    }
+    final generated = const Uuid().v4();
+    await prefs.setString('studentId', generated);
+    _studentId = generated;
   }
 
   @override
@@ -113,7 +134,7 @@ class _CheckInScreenState extends State<CheckInScreen> {
     try {
       final checkInRecord = CheckInRecord(
         checkinId: const Uuid().v4(),
-        studentId: 'STUDENT_001', // Should come from auth
+        studentId: _studentId,
         classId: _qrService.extractClassId(_classIdController.text) ?? '',
         checkinTime: DateTime.now(),
         gpsLatitude: _currentPosition!.latitude,
