@@ -1,0 +1,33 @@
+{
+  "indexes": [
+    {
+      "collectionGroup": "sessions",
+      "queryScope": "Collection",
+      "fields": [
+        {
+          "fieldPath": "studentId",
+          "order": "Ascending"
+        },
+        {
+          "fieldPath": "checkInData.checkinTime",
+          "order": "Descending"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "sessions",
+      "queryScope": "Collection",
+      "fields": [
+        {
+          "fieldPath": "classId",
+          "order": "Ascending"
+        },
+        {
+          "fieldPath": "checkInData.checkinTime",
+          "order": "Descending"
+        }
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}

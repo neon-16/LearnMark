@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <!-- App Display Name -->
+    <key>CFBundleDisplayName</key>
+    <string>LearnMark</string>
+    
+    <!-- Bundle Identifier -->
+    <key>CFBundleIdentifier</key>
+    <string>com.learnmark.app</string>
+
+    <!-- Privacy Descriptions -->
+    <key>NSLocationWhenInUseUsageDescription</key>
+    <string>LearnMark needs access to your location to verify you are in the classroom for class check-in.</string>
+
+    <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+    <string>LearnMark needs access to your location to verify you are in the classroom for class check-in.</string>
+
+    <key>NSLocationAlwaysUsageDescription</key>
+    <string>LearnMark needs access to your location to verify you are in the classroom for class check-in.</string>
+
+    <key>NSCameraUsageDescription</key>
+    <string>LearnMark needs camera access to scan QR codes for class verification.</string>
+
+    <!-- App Transport Security -->
+    <key>NSAppTransportSecurity</key>
+    <dict>
+        <key>NSAllowsArbitraryLoads</key>
+        <false/>
+        <key>NSExceptionDomains</key>
+        <dict>
+            <key>firebaseio.com</key>
+            <dict>
+                <key>NSIncludesSubdomains</key>
+                <true/>
+                <key>NSThirdPartyExceptionAllowsInsecureHTTPLoads</key>
+                <true/>
+            </dict>
+        </dict>
+    </key>
+
+    <!-- Supported Orientations -->
+    <key>UISupportedInterfaceOrientations</key>
+    <array>
+        <string>UIInterfaceOrientationPortrait</string>
+        <string>UIInterfaceOrientationLandscapeLeft</string>
+        <string>UIInterfaceOrientationLandscapeRight</string>
+    </array>
+
+    <!-- Background Modes (Optional) -->
+    <key>UIBackgroundModes</key>
+    <array>
+        <string>location</string>
+    </array>
+</dict>
+</plist>
