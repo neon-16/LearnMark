@@ -183,10 +183,11 @@ class _FinishClassScreenState extends State<FinishClassScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Finish Class'),
-        backgroundColor: Colors.green.shade700,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20.0),
@@ -293,7 +294,7 @@ class _FinishClassScreenState extends State<FinishClassScreen> {
                         icon: const Icon(Icons.my_location),
                         label: const Text('Get Location'),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.green.shade600,
+                          backgroundColor: colorScheme.secondary,
                         ),
                       ),
                     ),
@@ -318,7 +319,7 @@ class _FinishClassScreenState extends State<FinishClassScreen> {
                   icon: const Icon(Icons.camera_alt_outlined),
                   label: const Text('Open Scanner'),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green.shade600,
+                    backgroundColor: colorScheme.secondary,
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -414,11 +415,14 @@ class _FinishClassScreenState extends State<FinishClassScreen> {
                 child: Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: Colors.green.shade50,
-                    border: Border.all(color: Colors.green),
+                  color: const Color(0xFFE0F2FE),
+                  border: Border.all(color: colorScheme.primary),
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: Text(_statusMessage),
+                child: Text(
+                  _statusMessage,
+                  style: const TextStyle(color: Color(0xFF0F172A)),
+                ),
                 ),
               ),
 
@@ -429,7 +433,7 @@ class _FinishClassScreenState extends State<FinishClassScreen> {
               child: ElevatedButton(
                 onPressed: _isLoading ? null : _submitCheckOut,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green.shade600,
+                  backgroundColor: colorScheme.primary,
                 ),
                 child: _isLoading
                     ? const SizedBox(
@@ -468,11 +472,15 @@ class _FinishClassScreenState extends State<FinishClassScreen> {
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
           border: Border.all(
-            color: isSelected ? Colors.green : Colors.grey.shade300,
+            color: isSelected
+                ? Theme.of(context).colorScheme.primary
+                : Colors.grey.shade300,
             width: isSelected ? 2 : 1,
           ),
           borderRadius: BorderRadius.circular(12),
-          color: isSelected ? Colors.green.shade50 : Colors.white,
+          color: isSelected
+              ? Theme.of(context).colorScheme.primary.withOpacity(0.08)
+              : Colors.white,
         ),
         child: Column(
           children: [

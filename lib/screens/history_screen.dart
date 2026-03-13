@@ -20,6 +20,13 @@ class _HistoryScreenState extends State<HistoryScreen> {
     _sessionsFuture = _dbService.getAllSessions();
   }
 
+  Future<void> _refreshSessions() async {
+    setState(() {
+      _sessionsFuture = _dbService.getAllSessions();
+    });
+    await _sessionsFuture;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -27,55 +34,74 @@ class _HistoryScreenState extends State<HistoryScreen> {
         title: const Text('Attendance History'),
         backgroundColor: Colors.purple.shade700,
       ),
-      body: FutureBuilder<List<AttendanceSession>>(
-        future: _sessionsFuture,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          }
+      body: RefreshIndicator(
+        onRefresh: _refreshSessions,
+        child: FutureBuilder<List<AttendanceSession>>(
+          future: _sessionsFuture,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
+            }
 
-          if (snapshot.hasError) {
-            return Center(
-              child: Text('Error: ${snapshot.error}'),
-            );
-          }
+            if (snapshot.hasError) {
+              return Center(
+                child: Text('Error: ${snapshot.error}'),
+              );
+            }
 
-          final sessions = snapshot.data ?? [];
+            final sessions = snapshot.data ?? [];
 
-          if (sessions.isEmpty) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
+            if (sessions.isEmpty) {
+              return ListView(
+                physics: const AlwaysScrollableScrollPhysics(),
                 children: [
-                  Icon(
-                    Icons.history,
-                    size: 64,
-                    color: Colors.grey.shade400,
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'No attendance records yet',
-                    style: TextStyle(
-                      fontSize: 18,
-                      color: Colors.grey.shade600,
+                  SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.6,
+                    child: Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.history,
+                            size: 64,
+                            color: Colors.grey.shade400,
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            'No attendance records yet',
+                            style: TextStyle(
+                              fontSize: 18,
+                              color: Colors.grey.shade600,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            'Pull down to refresh after check-ins.',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey.shade500,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ],
-              ),
-            );
-          }
+              );
+            }
 
-          return ListView.builder(
-            padding: const EdgeInsets.all(16.0),
-            itemCount: sessions.length,
-            itemBuilder: (context, index) {
-              final session = sessions[index];
-              return _buildSessionCard(session);
-            },
-          );
-        },
+            return ListView.builder(
+              padding: const EdgeInsets.all(16.0),
+              itemCount: sessions.length,
+              itemBuilder: (context, index) {
+                final session = sessions[index];
+                return _buildSessionCard(session);
+              },
+            );
+          },
+        ),
       ),
     );
   }
@@ -132,18 +158,16 @@ class _HistoryScreenState extends State<HistoryScreen> {
               ),
               decoration: BoxDecoration(
                 color: session.isCompleted
-                    ? Colors.green.shade100
-                    : Colors.orange.shade100,
+                    ? const Color(0xFF166534)
+                    : const Color(0xFF9A3412),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Text(
                 session.isCompleted ? 'Completed' : 'Pending',
                 style: TextStyle(
                   fontSize: 10,
-                  fontWeight: FontWeight.bold,
-                  color: session.isCompleted
-                      ? Colors.green.shade700
-                      : Colors.orange.shade700,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.white,
                 ),
               ),
             ),

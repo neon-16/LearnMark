@@ -1,3 +1,7 @@
+import 'dart:convert';
+
+import 'package:flutter/foundation.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import '../models/attendance_model.dart';
@@ -60,6 +64,11 @@ class DatabaseService {
 
   // CheckIn Operations
   Future<bool> insertCheckIn(CheckInRecord record) async {
+    if (kIsWeb) {
+      final list = await _loadWebList('checkins');
+      list.add(record.toMap());
+      return _saveWebList('checkins', list);
+    }
     try {
       final db = await database;
       await db.insert('checkin_records', record.toMap());
@@ -71,6 +80,17 @@ class DatabaseService {
   }
 
   Future<CheckInRecord?> getCheckInById(String checkinId) async {
+    if (kIsWeb) {
+      final list = await _loadWebList('checkins');
+      final match = list.firstWhere(
+        (e) => e['checkinId'] == checkinId,
+        orElse: () => {},
+      );
+      if (match.isNotEmpty) {
+        return CheckInRecord.fromMap(Map<String, dynamic>.from(match));
+      }
+      return null;
+    }
     final db = await database;
     final maps = await db.query(
       'checkin_records',
@@ -84,6 +104,12 @@ class DatabaseService {
   }
 
   Future<List<CheckInRecord>> getAllCheckIns() async {
+    if (kIsWeb) {
+      final list = await _loadWebList('checkins');
+      return list
+          .map((e) => CheckInRecord.fromMap(Map<String, dynamic>.from(e)))
+          .toList();
+    }
     final db = await database;
     final maps = await db.query('checkin_records');
     return List.generate(
@@ -94,6 +120,11 @@ class DatabaseService {
 
   // CheckOut Operations
   Future<bool> insertCheckOut(CheckOutRecord record) async {
+    if (kIsWeb) {
+      final list = await _loadWebList('checkouts');
+      list.add(record.toMap());
+      return _saveWebList('checkouts', list);
+    }
     try {
       final db = await database;
       await db.insert('checkout_records', record.toMap());
@@ -105,6 +136,17 @@ class DatabaseService {
   }
 
   Future<CheckOutRecord?> getCheckOutByCheckinId(String checkinId) async {
+    if (kIsWeb) {
+      final list = await _loadWebList('checkouts');
+      final match = list.firstWhere(
+        (e) => e['checkinId'] == checkinId,
+        orElse: () => {},
+      );
+      if (match.isNotEmpty) {
+        return CheckOutRecord.fromMap(Map<String, dynamic>.from(match));
+      }
+      return null;
+    }
     final db = await database;
     final maps = await db.query(
       'checkout_records',
@@ -118,6 +160,12 @@ class DatabaseService {
   }
 
   Future<List<CheckOutRecord>> getAllCheckOuts() async {
+    if (kIsWeb) {
+      final list = await _loadWebList('checkouts');
+      return list
+          .map((e) => CheckOutRecord.fromMap(Map<String, dynamic>.from(e)))
+          .toList();
+    }
     final db = await database;
     final maps = await db.query('checkout_records');
     return List.generate(
@@ -140,8 +188,33 @@ class DatabaseService {
   }
 
   Future<void> clearAllData() async {
+    if (kIsWeb) {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove('checkins');
+      await prefs.remove('checkouts');
+      return;
+    }
     final db = await database;
     await db.delete('checkout_records');
     await db.delete('checkin_records');
+  }
+
+  // Web storage helpers (simple JSON arrays in SharedPreferences)
+  Future<List<Map<String, dynamic>>> _loadWebList(String key) async {
+    final prefs = await SharedPreferences.getInstance();
+    final raw = prefs.getString(key);
+    if (raw == null) return [];
+    final decoded = jsonDecode(raw) as List;
+    return decoded
+        .map((e) => Map<String, dynamic>.from(e as Map))
+        .toList();
+  }
+
+  Future<bool> _saveWebList(
+    String key,
+    List<Map<String, dynamic>> items,
+  ) async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.setString(key, jsonEncode(items));
   }
 }

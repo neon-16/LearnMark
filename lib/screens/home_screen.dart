@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../services/database_service.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -8,9 +9,27 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  final _dbService = DatabaseService();
   String studentName = 'Student Name';
   int totalCheckIns = 0;
   int completedSessions = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadStats();
+  }
+
+  Future<void> _loadStats() async {
+    final checkIns = await _dbService.getAllCheckIns();
+    final checkOuts = await _dbService.getAllCheckOuts();
+
+    if (!mounted) return;
+    setState(() {
+      totalCheckIns = checkIns.length;
+      completedSessions = checkOuts.length;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -18,8 +37,6 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         title: const Text('LearnMark'),
         centerTitle: true,
-        elevation: 0,
-        backgroundColor: Colors.blue.shade700,
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -29,19 +46,15 @@ class _HomeScreenState extends State<HomeScreen> {
             children: [
               // Welcome Section
               Card(
-                elevation: 2,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
                 child: Container(
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [Colors.blue.shade700, Colors.blue.shade500],
+                    gradient: const LinearGradient(
+                      colors: [Color(0xFF0EA5E9), Color(0xFF0B7285)],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                     ),
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(14),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -50,6 +63,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         'Welcome back,',
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                               color: Colors.white70,
+                              fontWeight: FontWeight.w500,
                             ),
                       ),
                       const SizedBox(height: 8),
@@ -74,7 +88,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       title: 'Check-ins',
                       value: totalCheckIns.toString(),
                       icon: Icons.login,
-                      color: Colors.green,
+                      color: const Color(0xFF10B981),
                     ),
                   ),
                   const SizedBox(width: 16),
@@ -83,7 +97,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       title: 'Completed',
                       value: completedSessions.toString(),
                       icon: Icons.check_circle,
-                      color: Colors.orange,
+                      color: const Color(0xFF38BDF8),
                     ),
                   ),
                 ],
@@ -105,13 +119,13 @@ class _HomeScreenState extends State<HomeScreen> {
                 height: 100,
                 child: ElevatedButton(
                   onPressed: () {
-                    Navigator.pushNamed(context, '/checkin');
+                    Navigator.pushNamed(context, '/checkin').then((_) => _loadStats());
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue.shade600,
-                    elevation: 4,
+                    backgroundColor: const Color(0xFF0EA5E9),
+                    elevation: 2,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(14),
                     ),
                   ),
                   child: Column(
@@ -143,13 +157,13 @@ class _HomeScreenState extends State<HomeScreen> {
                 height: 100,
                 child: ElevatedButton(
                   onPressed: () {
-                    Navigator.pushNamed(context, '/finish');
+                    Navigator.pushNamed(context, '/finish').then((_) => _loadStats());
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green.shade600,
-                    elevation: 4,
+                    backgroundColor: const Color(0xFF10B981),
+                    elevation: 2,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(14),
                     ),
                   ),
                   child: Column(
@@ -181,13 +195,13 @@ class _HomeScreenState extends State<HomeScreen> {
                 height: 100,
                 child: ElevatedButton(
                   onPressed: () {
-                    Navigator.pushNamed(context, '/history');
+                    Navigator.pushNamed(context, '/history').then((_) => _loadStats());
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.purple.shade600,
-                    elevation: 4,
+                    backgroundColor: const Color(0xFF64748B),
+                    elevation: 2,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(14),
                     ),
                   ),
                   child: Column(
